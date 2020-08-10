@@ -1,15 +1,16 @@
-import productApi from 'api/productApi';
-import SignIn from 'features/Auth/pages/SignIn';
-import firebase from 'firebase';
-import React, { Suspense, useEffect, useState } from 'react';
-import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom';
-import './App.scss';
-import Header from './components/Header';
-import NotFound from './components/NotFound';
-import { Button } from 'reactstrap';
+import productApi from "api/productApi";
+import SignIn from "features/Auth/pages/SignIn";
+import firebase from "firebase";
+import React, { Suspense, useEffect, useState } from "react";
+import { BrowserRouter, Redirect, Route, Switch} from "react-router-dom";
+import { Button } from "reactstrap";
 
+import "./App.scss";
+import Header from "./components/Header";
+import NotFound from "./components/NotFound";
+import LazyLoad from './components/LazyLoad'
 // Lazy load - Code splitting
-const Photo = React.lazy(() => import('./features/Photo'));
+const Photo = React.lazy(() => import("./features/Photo"));
 
 // Configure Firebase.
 const config = {
@@ -27,33 +28,34 @@ function App() {
         const params = {
           _page: 1,
           _limit: 10,
-
         };
         const response = await productApi.getAll(params);
         console.log(response);
         setProductList(response.data);
       } catch (error) {
-        console.log('Failed to fetch product list: ', error);
+        console.log("Failed to fetch product list: ", error);
       }
-    }
+    };
 
     fetchProductList();
   }, []);
 
   // Handle firebase auth changed
   useEffect(() => {
-    const unregisterAuthObserver = firebase.auth().onAuthStateChanged(async (user) => {
-      if (!user) {
-        // user logs out, handle something here
-        console.log('User is not logged in');
-        return;
-      }
+    const unregisterAuthObserver = firebase
+      .auth()
+      .onAuthStateChanged(async (user) => {
+        if (!user) {
+          // user logs out, handle something here
+          console.log("User is not logged in");
+          return;
+        }
 
-      console.log('Logged in user: ', user.displayName);
+        console.log("Logged in user: ", user.displayName);
 
-      const token = await user.getIdToken();
-      console.log('Logged in user token: ', token);
-    });
+        const token = await user.getIdToken();
+        console.log("Logged in user token: ", token);
+      });
 
     return () => unregisterAuthObserver();
   }, []);
@@ -63,19 +65,17 @@ function App() {
       const params = {
         _page: 1,
         _limit: 10,
-
       };
       const response = await productApi.getAll(params);
       console.log(response);
     } catch (error) {
-      console.log('Failed to fetch product list: ', error);
+      console.log("Failed to fetch product list: ", error);
     }
-  }
-
+  };
 
   return (
     <div className="photo-app">
-      <Suspense fallback={<div>Loading ...</div>}>
+      <Suspense fallback={<LazyLoad />}>
         <BrowserRouter>
           <Header />
 
